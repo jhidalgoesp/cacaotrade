@@ -1,11 +1,9 @@
 import React from 'react';
-import { render } from 'react-dom';
-import { Router, browserHistory } from 'react-router';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App';
+// uncomment if you would like to serve the final site with service workers
+// import registerServiceWorker from './registerServiceWorker';
 
-import routes from './routes';
-
-import './styles/global.sass';
-import './favicon.ico';
-
-
-render(<Router history={browserHistory} routes={routes} />, document.getElementById('app'));
+ReactDOM.render(<App />, document.getElementById('root'));
+// registerServiceWorker();
