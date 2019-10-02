@@ -2,4 +2,11 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Welcome to Add users page #{title}
+  form(method='POST' action='/users' )
+    .form-group
+      label(for='name') Name:
+    input(type='text', placeholder='username', name='name')
+    button.btn.btn-primary(type='submit') Add Users
+    <br>
+    <a href="/users">show users</a>
