@@ -8,6 +8,7 @@ const config = require('./config');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const suppliesRouter = require('./routes/supplies');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/', usersRouter);
+app.use('/users', usersRouter);
+app.use('/supplies', suppliesRouter);
 
 module.exports = app;
