@@ -9,6 +9,7 @@ const config = require('./config');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const publicationsRouter = require('./routes/publications');
+const offerRouter = require('./routes/offers');
 const authRouter = require('./routes/auth');
 
 const app = express();
@@ -29,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/publications', publicationsRouter);
+app.use('/offers', offerRouter);
 app.use('/auth', authRouter);
 
 module.exports = app;
