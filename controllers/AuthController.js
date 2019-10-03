@@ -36,7 +36,6 @@ AuthController.issueToken = (req, res) => {
   }
 
   const { email, password } = req.body;
-  console.log(password);
 
   User.findOne({ email })
     .then(user => {
