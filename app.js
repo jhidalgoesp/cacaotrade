@@ -8,7 +8,7 @@ const config = require('./config');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-const suppliesRouter = require('./routes/supplies');
+const publicationsRouter = require('./routes/publications');
 
 const app = express();
 
@@ -27,6 +27,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/supplies', suppliesRouter);
+app.use('/publications', publicationsRouter);
 
 module.exports = app;

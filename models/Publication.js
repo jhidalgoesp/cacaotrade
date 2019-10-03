@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const SupplySchema = new mongoose.Schema(
+const PublicationSchema = new mongoose.Schema(
   {
     message: String,
     type: String,
@@ -16,6 +16,6 @@ const SupplySchema = new mongoose.Schema(
   }
 );
 
-mongoose.model('Supply', SupplySchema);
+mongoose.model('Publication', PublicationSchema);
 
-module.exports = mongoose.model('Supply');
+module.exports = mongoose.model('Publication');

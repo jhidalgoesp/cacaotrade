@@ -1,13 +1,13 @@
 const { param, validationResult, checkSchema } = require('express-validator');
 
-const Supply = require('../models/Supply');
+const Publication = require('../models/Publication');
 const User = require('../models/User');
 
-const SupplyController = {};
+const PublicationController = {};
 
-SupplyController.validate = method => {
+PublicationController.validate = method => {
   switch (method) {
-    case 'createSupply': {
+    case 'createPublication': {
       return checkSchema({
         message: {
           in: ['body'],
@@ -99,15 +99,15 @@ SupplyController.validate = method => {
         },
       });
     }
-    case 'getSupply': {
-      return [param('supplyId', 'Invalid supplyId').isMongoId()];
+    case 'getPublication': {
+      return [param('publicationId', 'Invalid publicationId').isMongoId()];
     }
-    case 'updateSupply': {
+    case 'updatePublication': {
       return checkSchema({
-        supplyId: {
+        publicationId: {
           in: ['params'],
           isMongoId: {
-            errorMessage: 'Invalid supplyId'
+            errorMessage: 'Invalid publicationId'
           }
         },
         message: {
@@ -200,18 +200,18 @@ SupplyController.validate = method => {
         },
       });
     }
-    case 'deleteSupply': {
+    case 'deletePublication': {
       return checkSchema({
-        supplyId: {
+        publicationId: {
           in: ['params'],
           isMongoId: {
-            errorMessage: 'Invalid supplyId'
+            errorMessage: 'Invalid publicationId'
           },
           custom: {
             options: async value => {
-              const supply = await Supply.find({ _id: value, deletedAt: null });
-              if (!supply.length) {
-                return Promise.reject(new Error('Supply is not defined'));
+              const publication = await Publication.find({ _id: value, deletedAt: null });
+              if (!publication.length) {
+                return Promise.reject(new Error('Publication is not defined'));
               }
             }
           },
@@ -221,7 +221,7 @@ SupplyController.validate = method => {
   }
 };
 
-SupplyController.createSupply = (req, res) => {
+PublicationController.createPublication = (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -238,7 +238,7 @@ SupplyController.createSupply = (req, res) => {
     isActive,
   } = req.body;
 
-  Supply.create({
+  Publication.create({
     message,
     type,
     geolocation,
@@ -247,7 +247,7 @@ SupplyController.createSupply = (req, res) => {
     userId,
     isActive,
   })
-    .then(supply =>
+    .then(publication =>
       res.status(200).send({
         message,
         type,
@@ -261,12 +261,12 @@ SupplyController.createSupply = (req, res) => {
     .catch(err =>
       res.status(500).send({
         errors: err,
-        message: 'There was a problem creating the supply.'
+        message: 'There was a problem creating the Publication.'
       })
     );
 };
 
-SupplyController.listSupplies = (req, res) => {
+PublicationController.listPublications = (req, res) => {
   const { message, type, isActive } = req.query;
 
   const filter = {
@@ -285,104 +285,104 @@ SupplyController.listSupplies = (req, res) => {
     filter['isActive'] = isActive;
   }
 
-  Supply.find(filter)
-    .then(supplies => res.status(200).send({ supplies }))
+  Publication.find(filter)
+    .then(publications => res.status(200).send({ publications }))
     .catch(err =>
       res.status(500).send({
         errors: err,
-        message: 'There was a problem finding the supplies.'
+        message: 'There was a problem finding the publications.'
       })
     );
 };
 
-SupplyController.getSupply = (req, res) => {
+PublicationController.getPublication = (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return res.status(422).send({ errors: errors.array() });
   }
 
-  const { supplyId } = req.params;
+  const { publicationId } = req.params;
 
-  Supply.findById(supplyId)
-    .then(supply => {
-      if (!supply) {
+  Publication.findById(publicationId)
+    .then(publication => {
+      if (!publication) {
         return res.status(404).send({
           errors: {
             location: 'params',
-            param: 'supplyId',
-            value: supplyId,
-            msg: 'Supply not found'
+            param: 'publicationId',
+            value: publicationId,
+            msg: 'Publication not found'
           }
         });
       }
-      return res.status(200).send({ supply });
+      return res.status(200).send({ publication });
     })
     .catch(err =>
       res.status(500).send({
         errors: err,
-        message: 'There was a problem finding the Supply.'
+        message: 'There was a problem finding the Publication.'
       })
     );
 };
 
-SupplyController.updateSupply = (req, res) => {
+PublicationController.updatePublication = (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return res.status(422).send({ errors: errors.array() });
   }
 
-  const { supplyId } = req.params;
+  const { publicationId } = req.params;
   const toUpdate = req.body;
 
-  Supply.findOneAndUpdate({ _id: supplyId }, toUpdate, {
+  Publication.findOneAndUpdate({ _id: publicationId }, toUpdate, {
     new: true,
     useFindAndModify: false
   })
-    .then(supply => {
-      if (!supply) {
+    .then(publication => {
+      if (!publication) {
         return res.status(404).send({
           errors: {
             location: 'params',
-            param: 'supplyId',
-            value: supplyId,
-            msg: 'Supply not found'
+            param: 'publicationId',
+            value: publicationId,
+            msg: 'Publication not found'
           }
         });
       }
 
-      return res.status(200).send({ supply });
+      return res.status(200).send({ publication });
     })
     .catch(err =>
       res.status(500).send({
         errors: err,
-        message: 'There was a problem finding the supplies.'
+        message: 'There was a problem finding the publications.'
       })
     );
 };
 
-SupplyController.deleteSupply = (req, res) => {
+PublicationController.deletePublication = (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return res.status(422).send({ errors: errors.array() });
   }
 
-  const { supplyId } = req.params;
+  const { publicationId } = req.params;
 
-  Supply.findOneAndUpdate({ _id: supplyId }, { deletedAt: new Date }, {
+  Publication.findOneAndUpdate({ _id: publicationId }, { deletedAt: new Date }, {
     new: true,
     useFindAndModify: false
   })
-    .then(supply => {
-      if (!supply) {
+    .then(publication => {
+      if (!publication) {
         return res.status(404).send({
           errors: {
             location: 'params',
-            param: 'supplyId',
-            value: supplyId,
-            msg: 'Supply not found'
+            param: 'publicationId',
+            value: publicationId,
+            msg: 'Publication not found'
           }
         });
       }
@@ -392,9 +392,9 @@ SupplyController.deleteSupply = (req, res) => {
     .catch(err =>
       res.status(500).send({
         errors: err,
-        message: 'There was a problem finding the supplies.'
+        message: 'There was a problem finding the publications.'
       })
     );
 };
 
-module.exports = SupplyController;
+module.exports = PublicationController;
