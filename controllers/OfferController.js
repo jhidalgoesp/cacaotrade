@@ -1,13 +1,14 @@
 const { param, validationResult, checkSchema } = require('express-validator');
 
+const Offer = require('../models/Offer');
 const Publication = require('../models/Publication');
 const User = require('../models/User');
 
-const PublicationController = {};
+const OfferController = {};
 
-PublicationController.validate = method => {
+OfferController.validate = method => {
   switch (method) {
-    case 'createPublication': {
+    case 'createOffer': {
       return checkSchema({
         message: {
           in: ['body'],
@@ -16,19 +17,6 @@ PublicationController.validate = method => {
           },
           isEmpty: {
             errorMessage: 'Message field cannot be empty',
-            negated: true
-          },
-          trim: true,
-          escape: true,
-          stripLow: true
-        },
-        type: {
-          in: ['body'],
-          exists: {
-            errorMessage: 'Type field is required'
-          },
-          isEmpty: {
-            errorMessage: 'Type field cannot be empty',
             negated: true
           },
           trim: true,
@@ -48,6 +36,17 @@ PublicationController.validate = method => {
           escape: true,
           stripLow: true
         },
+        bid: {
+          in: ['body'],
+          exists: {
+            errorMessage: 'Bid field is required'
+          },
+          isEmpty: {
+            errorMessage: 'Bid field cannot be empty',
+            negated: true
+          },
+          trim: true
+        },
         weight: {
           in: ['body'],
           exists: {
@@ -55,17 +54,6 @@ PublicationController.validate = method => {
           },
           isEmpty: {
             errorMessage: 'Weight field cannot be empty',
-            negated: true
-          },
-          trim: true
-        },
-        price: {
-          in: ['body'],
-          exists: {
-            errorMessage: 'Price field is required'
-          },
-          isEmpty: {
-            errorMessage: 'Price field cannot be empty',
             negated: true
           },
           trim: true
@@ -88,35 +76,44 @@ PublicationController.validate = method => {
             }
           },
           trim: true
+        },
+        publicationId: {
+          in: ['body'],
+          exists: {
+            errorMessage: 'Publication Id field is required'
+          },
+          isEmpty: {
+            errorMessage: 'Publication Id field cannot be empty',
+            negated: true
+          },
+          custom: {
+            options: async value => {
+              const publication = await Publication.find({ _id: value });
+              if (!publication.length) {
+                return Promise.reject(new Error('Publication is not defined'));
+              }
+            }
+          },
+          trim: true
         }
       });
     }
-    case 'getPublication': {
-      return [param('publicationId', 'Invalid publicationId').isMongoId()];
+    case 'getOffer': {
+      return [param('offerId', 'Invalid offerId').isMongoId()];
     }
-    case 'updatePublication': {
+    case 'updateOffer': {
       return checkSchema({
-        publicationId: {
+        offerId: {
           in: ['params'],
           isMongoId: {
-            errorMessage: 'Invalid publicationId'
-          }
+            errorMessage: 'Invalid offerId'
+          },
+          optional: true
         },
         message: {
           in: ['body'],
           isEmpty: {
             errorMessage: 'Message field cannot be empty',
-            negated: true
-          },
-          optional: true,
-          trim: true,
-          escape: true,
-          stripLow: true
-        },
-        type: {
-          in: ['body'],
-          isEmpty: {
-            errorMessage: 'Type field cannot be empty',
             negated: true
           },
           optional: true,
@@ -144,10 +141,10 @@ PublicationController.validate = method => {
           optional: true,
           trim: true
         },
-        price: {
+        bid: {
           in: ['body'],
           isEmpty: {
-            errorMessage: 'Price field cannot be empty',
+            errorMessage: 'Bid field cannot be empty',
             negated: true
           },
           optional: true,
@@ -159,6 +156,7 @@ PublicationController.validate = method => {
             errorMessage: 'User Id field cannot be empty',
             negated: true
           },
+          optional: true,
           custom: {
             options: async value => {
               const user = await User.find({ _id: value });
@@ -167,26 +165,45 @@ PublicationController.validate = method => {
               }
             }
           },
+          trim: true
+        },
+        publicationId: {
+          in: ['body'],
+          exists: {
+            errorMessage: 'Publication Id field is required'
+          },
+          isEmpty: {
+            errorMessage: 'Publication Id field cannot be empty',
+            negated: true
+          },
           optional: true,
+          custom: {
+            options: async value => {
+              const publication = await Publication.find({ _id: value });
+              if (!publication.length) {
+                return Promise.reject(new Error('Publication is not defined'));
+              }
+            }
+          },
           trim: true
         }
       });
     }
-    case 'deletePublication': {
+    case 'deleteOffer': {
       return checkSchema({
-        publicationId: {
+        offerId: {
           in: ['params'],
           isMongoId: {
-            errorMessage: 'Invalid publicationId'
+            errorMessage: 'Invalid offerId'
           },
           custom: {
             options: async value => {
-              const publication = await Publication.find({
+              const offer = await Offer.find({
                 _id: value,
                 deletedAt: null
               });
-              if (!publication.length) {
-                return Promise.reject(new Error('Publication is not defined'));
+              if (!offer.length) {
+                return Promise.reject(new Error('Offer is not defined'));
               }
             }
           }
@@ -196,43 +213,34 @@ PublicationController.validate = method => {
   }
 };
 
-PublicationController.createPublication = (req, res) => {
+OfferController.createOffer = (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return res.status(422).send({ errors: errors.array() });
   }
 
-  const {
-    message,
-    type,
-    geolocation,
-    weight,
-    price,
-    userId,
-    isActive
-  } = req.body;
+  const { message, geolocation, bid, weight, userId, publicationId } = req.body;
 
-  Publication.create({
+  Offer.create({
     message,
-    type,
     geolocation,
+    bid,
     weight,
-    price,
     userId,
-    isActive
+    publicationId
   })
-    .then(publication => res.status(200).send({ publication }))
+    .then(offer => res.status(200).send({ offer }))
     .catch(err =>
       res.status(500).send({
         errors: err,
-        message: 'There was a problem creating the Publication.'
+        message: 'There was a problem creating the Offer.'
       })
     );
 };
 
-PublicationController.listPublications = (req, res) => {
-  const { message, type, isActive } = req.query;
+OfferController.listOffers = (req, res) => {
+  const { message, type, geolocation } = req.query;
 
   const filter = {
     deletedAt: null
@@ -242,116 +250,112 @@ PublicationController.listPublications = (req, res) => {
     filter['message'] = message;
   }
 
-  if (type) {
-    filter['type'] = type;
+  if (geolocation) {
+    filter['geolocation'] = type;
   }
 
-  if (isActive) {
-    filter['isActive'] = isActive;
-  }
-
-  Publication.find(filter)
-    .then(publications => res.status(200).send({ publications }))
+  Offer.find(filter)
+    .then(offers => res.status(200).send({ offers }))
     .catch(err =>
       res.status(500).send({
         errors: err,
-        message: 'There was a problem finding the publications.'
+        message: 'There was a problem finding the offers.'
       })
     );
 };
 
-PublicationController.getPublication = (req, res) => {
+OfferController.getOffer = (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return res.status(422).send({ errors: errors.array() });
   }
 
-  const { publicationId } = req.params;
+  const { offerId } = req.params;
 
-  Publication.findById(publicationId)
-    .then(publication => {
-      if (!publication) {
+  Offer.findById(offerId)
+    .then(offer => {
+      if (!offer) {
         return res.status(404).send({
           errors: {
             location: 'params',
-            param: 'publicationId',
-            value: publicationId,
-            msg: 'Publication not found'
+            param: 'offerId',
+            value: offerId,
+            msg: 'Offer not found'
           }
         });
       }
-      return res.status(200).send({ publication });
+      return res.status(200).send({ offer });
     })
     .catch(err =>
       res.status(500).send({
         errors: err,
-        message: 'There was a problem finding the Publication.'
+        message: 'There was a problem finding the Offer.'
       })
     );
 };
 
-PublicationController.updatePublication = (req, res) => {
+OfferController.updateOffer = (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return res.status(422).send({ errors: errors.array() });
   }
 
-  const { publicationId } = req.params;
+  const { offerId } = req.params;
   const toUpdate = req.body;
 
-  Publication.findOneAndUpdate({ _id: publicationId }, toUpdate, {
+  Offer.findOneAndUpdate({ _id: offerId }, toUpdate, {
     new: true,
     useFindAndModify: false
   })
-    .then(publication => {
-      if (!publication) {
+    .then(offer => {
+      if (!offer) {
         return res.status(404).send({
           errors: {
             location: 'params',
-            param: 'publicationId',
-            value: publicationId,
-            msg: 'Publication not found'
+            param: 'offerId',
+            value: offerId,
+            msg: 'Offer not found'
           }
         });
       }
 
-      return res.status(200).send({ publication });
+      return res.status(200).send({ offer });
     })
     .catch(err =>
       res.status(500).send({
         errors: err,
-        message: 'There was a problem finding the publications.'
+        message: 'There was a problem finding the offers.'
       })
     );
 };
 
-PublicationController.deletePublication = (req, res) => {
+OfferController.deleteOffer = (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return res.status(422).send({ errors: errors.array() });
   }
 
-  const { publicationId } = req.params;
+  const { offerId } = req.params;
 
-  Publication.findOneAndUpdate(
-    { _id: publicationId },
+  Offer.findOneAndUpdate(
+    { _id: offerId },
     { deletedAt: new Date() },
     {
       new: true,
       useFindAndModify: false
     }
   )
-    .then(publication => {
-      if (!publication) {
+    .then(offer => {
+      if (!offer) {
         return res.status(404).send({
           errors: {
             location: 'params',
-            param: 'publicationId',
-            value: publicationId,
-            msg: 'Publication not found'
+            param: 'offerId',
+            value: offerId,
+            msg: 'Offer not found'
           }
         });
       }
@@ -361,9 +365,9 @@ PublicationController.deletePublication = (req, res) => {
     .catch(err =>
       res.status(500).send({
         errors: err,
-        message: 'There was a problem finding the publications.'
+        message: 'There was a problem finding the offers.'
       })
     );
 };
 
-module.exports = PublicationController;
+module.exports = OfferController;
