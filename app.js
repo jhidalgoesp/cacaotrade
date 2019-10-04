@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -20,6 +21,19 @@ mongoose.connect(connectUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
+
+// enable CORS policy for a select few origins
+// only the origin option is required, the rest are optional
+app.use(cors({ 
+  origin: config.corsConfiguration.allowedOrigins.split(config.corsConfiguration.delimiter),
+  methods: config.corsConfiguration.allowedMethods,
+  allowedHeaders: config.corsConfiguration.allowedHeaders,
+  exposedHeaders: config.corsConfiguration.exposedHeaders,
+  credentials: config.corsConfiguration.allowCredentials,
+  maxAge: config.corsConfiguration.maxAge,
+  preflightContinue: config.corsConfiguration.preflightContinue,
+  optionsSuccessStatus: config.corsConfiguration.responseSuccessCode
+}));
 
 app.use(logger('dev'));
 app.use(express.json());
