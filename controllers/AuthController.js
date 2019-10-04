@@ -53,7 +53,7 @@ AuthController.issueToken = (req, res) => {
         });
       }
     })
-    .catch(err => {
+    .catch(() => {
       res.status(401).send({
         errors: [{ msg: 'Invalid email or password' }]
       });
