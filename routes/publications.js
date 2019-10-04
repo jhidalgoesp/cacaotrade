@@ -1,5 +1,5 @@
 const express = require('express');
-const {validateToken} = require('../controllers/AuthController');
+const { validateToken } = require('../controllers/AuthController');
 const PublicationController = require('../controllers/PublicationController');
 
 const router = express.Router();
@@ -13,9 +13,7 @@ router.post(
 );
 
 /* GET publications listing. */
-router.get('/', 
-  validateToken, 
-  PublicationController.listPublications);
+router.get('/', validateToken, PublicationController.listPublications);
 
 /* GET a publication. */
 router.get(

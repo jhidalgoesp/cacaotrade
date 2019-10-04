@@ -1,6 +1,6 @@
 const express = require('express');
 const OfferController = require('../controllers/OfferController');
-const {validateToken} = require('../controllers/AuthController');
+const { validateToken } = require('../controllers/AuthController');
 const router = express.Router();
 
 /* Creates a new offer. */
