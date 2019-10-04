@@ -7,12 +7,15 @@ const router = express.Router();
 /* Creates a new publication. */
 router.post(
   '/',
+  validateToken,
   PublicationController.validate('createPublication'),
   PublicationController.createPublication
 );
 
 /* GET publications listing. */
-router.get('/', validateToken, PublicationController.listPublications);
+router.get('/', 
+  validateToken, 
+  PublicationController.listPublications);
 
 /* GET a publication. */
 router.get(
