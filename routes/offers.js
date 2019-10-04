@@ -1,6 +1,6 @@
 const express = require('express');
 const OfferController = require('../controllers/OfferController');
-
+const {validateToken} = require('../controllers/AuthController');
 const router = express.Router();
 
 /* Creates a new offer. */
@@ -16,6 +16,7 @@ router.get('/', OfferController.listOffers);
 /* GET an offer. */
 router.get(
   '/:offerId',
+  validateToken,
   OfferController.validate('getOffer'),
   OfferController.getOffer
 );
@@ -23,6 +24,7 @@ router.get(
 /* Update an offer. */
 router.put(
   '/:offerId',
+  validateToken,
   OfferController.validate('updateOffer'),
   OfferController.updateOffer
 );
@@ -30,6 +32,7 @@ router.put(
 /* Update an offer. */
 router.delete(
   '/:offerId',
+  validateToken,
   OfferController.validate('deleteOffer'),
   OfferController.deleteOffer
 );

@@ -1,4 +1,5 @@
 const express = require('express');
+const {validateToken} = require('../controllers/AuthController');
 const PublicationController = require('../controllers/PublicationController');
 
 const router = express.Router();
@@ -11,11 +12,12 @@ router.post(
 );
 
 /* GET publications listing. */
-router.get('/', PublicationController.listPublications);
+router.get('/', validateToken, PublicationController.listPublications);
 
 /* GET a publication. */
 router.get(
   '/:publicationId',
+  validateToken,
   PublicationController.validate('getPublication'),
   PublicationController.getPublication
 );
@@ -23,6 +25,7 @@ router.get(
 /* Update a publication. */
 router.put(
   '/:publicationId',
+  validateToken,
   PublicationController.validate('updatePublication'),
   PublicationController.updatePublication
 );
@@ -30,6 +33,7 @@ router.put(
 /* Update a publication. */
 router.delete(
   '/:publicationId',
+  validateToken,
   PublicationController.validate('deletePublication'),
   PublicationController.deletePublication
 );

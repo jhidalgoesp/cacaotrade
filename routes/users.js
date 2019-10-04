@@ -1,5 +1,6 @@
 const express = require('express');
 const userController = require('../controllers/UserController');
+const {validateToken} = require('../controllers/AuthController');
 
 const router = express.Router();
 
@@ -11,11 +12,12 @@ router.post(
 );
 
 /* GET users listing. */
-router.get('/', userController.listUsers);
+router.get('/', validateToken, userController.listUsers);
 
 /* GET a user. */
 router.get(
   '/:userId',
+  validateToken,
   userController.validate('getUser'),
   userController.getUser
 );
@@ -23,6 +25,7 @@ router.get(
 /* Update a user. */
 router.put(
   '/:userId',
+  validateToken,
   userController.validate('updateUser'),
   userController.updateUser
 );
