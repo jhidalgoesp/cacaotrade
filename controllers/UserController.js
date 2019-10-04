@@ -161,7 +161,7 @@ UserController.createUser = (req, res) => {
     phone,
     status: 'enabled'
   })
-    .then(user =>
+    .then(() =>
       res.status(200).send({
         firstName,
         lastName,
