@@ -6,12 +6,13 @@ const router = express.Router();
 /* Creates a new offer. */
 router.post(
   '/',
+  validateToken,
   OfferController.validate('createOffer'),
   OfferController.createOffer
 );
 
 /* GET offers listing. */
-router.get('/', OfferController.listOffers);
+router.get('/', validateToken, OfferController.listOffers);
 
 /* GET an offer. */
 router.get(
